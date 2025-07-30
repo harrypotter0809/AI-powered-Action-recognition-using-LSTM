@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Action Recognition Website</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+    <header>
+        <nav>
+            <ul>
+                <li><a href="#" onclick="showSection('welcome')">Home</a></li>
+                <li><a href="#" onclick="showSection('training')">Live Action</a></li>
+                <li><a href="#" onclick="showSection('contact')">Contact Us</a></li>
+            </ul>
+        </nav>
+        <div class="logo">
+            <img src="https://th.bing.com/th/id/OIP.JAPRMgfzKv14zmD_C0sZygHaHa?w=180&h=180&c=7&r=0&o=5&dpr=1.4&pid=1.7" alt="AR Logo">
+        </div>
+    </header>
+    
+    <main>
+        <section class="welcome" id="welcome">
+            <h1>Welcome to Action Recognition</h1>
+            <p>Explore the power of action recognition technology.</p>
+            <button onclick="showSection('training')">Start Training</button>
+        </section>
+        
+        <section class="training" id="training">
+            <h2>Training Page</h2>
+            <div class="video-container">
+                <div class="frame">
+                    <h3>Webcam Feed</h3>
+                    <img id="webcam" width="640" height="480">
+                    <button onclick="startWebcam()">Start</button>
+                    <button onclick="stopWebcam()">Stop</button>
+                    <div id="recognized-action">Recognized Action: None</div>
+                </div>
+                <div class="frame">
+                    <h3>Instructions</h3>
+                    <ol>
+                        <li>Click the Start button to begin recording.</li>
+                        <li>Perform the action you want to recognize.</li>
+                        <li>Maintain proper distance from the camera</li>
+                        <li>Please ensure to have a proper light </li>
+                        <li>The recognized action will be displayed below the webcam feed.</li>
+                        <li>Click the Stop button when finished.</li>
+                    </ol>
+                    <div class="translation-options">
+                        <p>Would you like to translate the content?</p>
+                        <button onclick="showContactForm()">Yes</button>
+                        <button onclick="alert('Translation canceled')">No</button>
+                    </div>
+                    <div id="language-options"></div>
+                        <p>Choose the language:</p>
+                        <select id="language-select">
+                            <option value="">Select a language</option>
+                            <option value="te">Telugu</option>
+                            <option value="hi">Hindi</option>
+                            <option value="ta">Tamil</option>
+                            <option value="ml">Malayalam</option>
+                            <option value="kn">Kannada</option>
+                            <option value="en">English</option>
+                        </select>
+                        <button onclick="showContactForm()">Next</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <section class="contact-form" id="contact-form">
+            <h2>Contact Information</h2>
+            <p>Please enter your phone number to receive the translated content:</p>
+            <input id="phone" type="number" placeholder="Enter your phone number" required>
+            <button onclick="submitPhoneNumber()">Submit</button>
+            <p>Choose your preferred method:</p>
+            <button onclick="sendMessage('whatsapp')">WhatsApp</button>
+            <button onclick="sendMessage('sms')">SMS</button>
+        </section>
+        
+        <section class="contact" id="contact" style="display:none;">
+            <h2>Contact Us</h2>
+            <p>For more information, please contact us at info@atluritanuja.com</p>
+        </section>
+    </main>
+<script src="{{ url_for('static', filename='index.js') }}"></script>
+<script>
+    function startWebcam() {
+        document.getElementById("webcam").src = `{{ url_for('video_feed') }}`;
+        document.getElementById('recognized-action').innerHTML = "Recognized Action: Analyzing...";
+    }
+
+    async function stopWebcam() {
+        document.getElementById('webcam').src = "";
+        const response = await fetch('/get_sentence');
+        const actions = await response.json();
+        document.getElementById('recognized-action').innerHTML = `Recognized Action: ${actions.sentence}`;
+    }
+   </script>
+</body>
+</html>
